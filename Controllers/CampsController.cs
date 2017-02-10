@@ -70,6 +70,9 @@ namespace CodeCamp.Controllers
         {
             try
             {
+                // display errors if model is invalid
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+
                 _logger.LogInformation("Creating new camp.");
 
                 // we are getting the model from request.body. need to convert model into entity.

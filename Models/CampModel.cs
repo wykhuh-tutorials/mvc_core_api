@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,12 +10,21 @@ namespace CodeCamp.Models
     {
         // use custom Url instead of Id
         public string Url { get; set; }
+        [Required]
+        [MinLength(3)]
+        [MaxLength(20)]
         public string Moniker { get; set; }
+        [Required]
+        [MinLength(5)]
+        [MaxLength(100)]
         public string Name { get; set; }
         // the entity has EventDate; we want StartDate and EndDate for the model
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int Length { get; set; }
+        [Required]
+        [MinLength(25)]
+        [MaxLength(4096)]
         public string Description { get; set; }
 
         // Camp entity has Location, which is a nested object.
