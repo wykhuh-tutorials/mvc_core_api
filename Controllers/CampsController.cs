@@ -27,5 +27,22 @@ namespace CodeCamp.Controllers
 
             return Ok(camps);
         }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
+        {
+            try
+            {
+                var camp = _repo.GetCamp(id);
+                if (camp == null) return NotFound($"Camp {id} not found.");
+
+                return Ok(camp);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+        }
     }
 }
