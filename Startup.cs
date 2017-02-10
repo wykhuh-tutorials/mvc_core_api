@@ -35,6 +35,8 @@ namespace CodeCamp
 
         private IConfigurationRoot _config;
 
+        // ConfigureServices and Configure are called once when server fires up.
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // setup dependency injection layer
         public void ConfigureServices(IServiceCollection services)
@@ -49,6 +51,9 @@ namespace CodeCamp
             // pass in interface and concrete implementation
             services.AddScoped<ICampRepository, CampRepository>();
 
+            //seed database
+            services.AddTransient<CampDbInitializer>();
+
             services.AddApplicationInsightsTelemetry(_config);
 
             services.AddMvc();
@@ -56,7 +61,10 @@ namespace CodeCamp
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         // setup how requests are being handled.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            ILoggerFactory loggerFactory,
+            CampDbInitializer seeder)
         {
             loggerFactory.AddConsole(_config.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -66,6 +74,9 @@ namespace CodeCamp
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseMvc();
+
+            // Seed is async task. use Wait to make it synchronous.
+            seeder.Seed().Wait();
         }
     }
 }
