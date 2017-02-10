@@ -23,7 +23,7 @@ namespace CodeCamp.Models
         public string Resolve(Camp source, CampModel destination, string destMember, ResolutionContext context)
         {
             var url = (IUrlHelper)_httpContextAccessor.HttpContext.Items[BaseController.URLHELPER];
-            var b =  url.Link("CampGet", new { id = source.Id });
+            var b =  url.Link("CampGet", new { moniker = source.Moniker });
             return b;
         }
     }

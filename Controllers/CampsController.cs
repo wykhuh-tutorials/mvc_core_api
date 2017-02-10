@@ -38,18 +38,18 @@ namespace CodeCamp.Controllers
             return Ok(_mapper.Map<IEnumerable<CampModel>>(camps));
         }
 
-        [HttpGet("{id}", Name ="CampGet")]
+        [HttpGet("{moniker}", Name ="CampGet")]
         // MVC assumes any pass in parameter listed in the url are query string parameters
-        public IActionResult Get(int id, bool includeSpeakers = false)
+        public IActionResult Get(string moniker, bool includeSpeakers = false)
         {
             try
             {
                 Camp camp = null;
 
-                if (includeSpeakers) camp = _repo.GetCampWithSpeakers(id);
-                else camp = _repo.GetCamp(id);
+                if (includeSpeakers) camp = _repo.GetCampByMonikerWithSpeakers(moniker);
+                else camp = _repo.GetCampByMoniker(moniker);
 
-                if (camp == null) return NotFound($"Camp {id} not found.");
+                if (camp == null) return NotFound($"Camp {moniker} not found.");
 
                 // opt.Items passes a collection into the resolver.
                 // we are passing down UrlHelper to the resolver
