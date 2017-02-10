@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using CodeCamp.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
@@ -15,13 +17,17 @@ namespace CodeCamp.Controllers
     {
         private ICampRepository _repo;
         private ILogger _logger;
+        private IMapper _mapper;
 
         // constructor inject to access dependencies
-        public CampsController(ICampRepository repo, ILogger<CampsController> logger)
+        public CampsController(ICampRepository repo, 
+            ILogger<CampsController> logger,
+            IMapper mapper)
         {
             // save copy of passed-in repo
             _repo = repo;
             _logger = logger;
+            _mapper = mapper;
         }
         [HttpGet("")]
         // use IActionResult to return status code with the data 
@@ -29,7 +35,7 @@ namespace CodeCamp.Controllers
         {
             var camps = _repo.GetAllCamps();
 
-            return Ok(camps);
+            return Ok(_mapper.Map<IEnumerable<CampModel>>(camps));
         }
 
         [HttpGet("{id}", Name ="CampGet")]
@@ -45,7 +51,7 @@ namespace CodeCamp.Controllers
 
                 if (camp == null) return NotFound($"Camp {id} not found.");
 
-                return Ok(camp);
+                return Ok(_mapper.Map<CampModel>(camp));
             }
             catch
             {
