@@ -45,7 +45,11 @@ namespace CodeCamp.Profiles
                             PostalCode = c.LocationPostalCode,
                             Country = c.LocationCountry
                         }));
-                
+
+            CreateMap<Speaker, SpeakerModel>()
+                .ForMember(c => c.Url,
+                    opt => opt.ResolveUsing<SpeakerUrlResolver>())
+                .ReverseMap();
         }
     }
 }

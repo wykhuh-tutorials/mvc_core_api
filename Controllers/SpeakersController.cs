@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using MyCodeCamp.Data;
 using Microsoft.AspNetCore.Mvc;
+using CodeCamp.Models;
+using MyCodeCamp.Data.Entities;
 
 namespace CodeCamp.Controllers
 {
@@ -29,17 +31,17 @@ namespace CodeCamp.Controllers
         public IActionResult Get(string moniker)
         {
             var speakers = _respository.GetSpeakersByMoniker(moniker);
-            return Ok(speakers);
+            return Ok(_mapper.Map<IEnumerable<SpeakerModel>>(speakers));
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "SpeakerGet")]
         public IActionResult Get(string moniker, int id)
         {
             var speaker = _respository.GetSpeaker(id);
             if (speaker == null) return NotFound();
             if (speaker.Camp.Moniker != moniker) return BadRequest("Speaker not in specified camp");
 
-            return Ok(speaker);
+            return Ok(_mapper.Map<SpeakerModel>(speaker));
         }
     }
 }
