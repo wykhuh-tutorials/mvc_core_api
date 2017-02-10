@@ -14,7 +14,15 @@ namespace CodeCamp.Profiles
         public CampMappingProfile()
         {
             // map Camp entity to CampModel
-            CreateMap<Camp, CampModel>();
+            CreateMap<Camp, CampModel>()
+                // first lamda: new field to add to model
+                // second lambda: how to calculate new field
+                .ForMember(c => c.StartDate, 
+                    // MapFrom allows us to map from another entity field
+                    opt => opt.MapFrom(camp => camp.EventDate))
+                .ForMember(c => c.EndDate,
+                    // ResolveUsing allows us to calculate the model field
+                    opt => opt.ResolveUsing(camp => camp.EventDate.AddDays(camp.Length - 1)));
         }
     }
 }
