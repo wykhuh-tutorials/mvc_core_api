@@ -104,35 +104,34 @@ namespace CodeCamp.Controllers
         }
 
         // accept both PUT and PATCH
-        [HttpPut("{id}")]
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Camp model)
+        [HttpPut("{moniker}")]
+        [HttpPatch("{moniker}")]
+        public async Task<IActionResult> Put(string moniker, [FromBody] CampModel model)
         {
             try
             {
-                var oldCamp = _repo.GetCamp(id);
-                if (oldCamp == null) return NotFound($"Could not find camp id {id}");
+                if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                // map model to oldCamp
-                // if model.Name is null, assign oldCamp.Name
-                oldCamp.Name = model.Name ?? oldCamp.Name;
-                oldCamp.Description = model.Description ?? oldCamp.Description;
-                oldCamp.Location = model.Location ?? oldCamp.Location;
-                oldCamp.Length = model.Length > 0 ? model.Length : oldCamp.Length;
-                oldCamp.EventDate = model.EventDate != DateTime.MinValue ? model.EventDate : oldCamp.EventDate;
+                var oldCamp = _repo.GetCampByMoniker(moniker);
+                if (oldCamp == null) return NotFound($"Could not find camp moniker {moniker}");
 
+                // modify the oldCamp
+                // take the request.Body model, and override fields in oldCamp
+                _mapper.Map(model, oldCamp);
 
                 if (await _repo.SaveAllAsync())
                 {
                     // oldCamp has been updated with changes
-                    return Ok(oldCamp);
+                    return Ok(_mapper.Map<CampModel>(oldCamp));
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"update camp exception: {ex}");
+
             }
-            return BadRequest();
+            return BadRequest("something blew up");
+
         }
 
         [HttpDelete("{moniker}")]
