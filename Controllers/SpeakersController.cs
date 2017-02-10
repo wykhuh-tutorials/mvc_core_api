@@ -97,5 +97,29 @@ namespace CodeCamp.Controllers
             return BadRequest("update speaker error");
 
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string moniker, int id)
+        {
+            try
+            {
+                var speaker = _repository.GetSpeaker(id);
+                if (speaker == null) return NotFound();
+                if (speaker.Camp.Moniker != moniker) return BadRequest("Speaker not in specified camp");
+
+                _repository.Delete(speaker);
+
+                if (await _repository.SaveAllAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"delete speaker exception: {ex}");
+            }
+            return BadRequest("delete speaker error");
+
+        }
     }
 }
