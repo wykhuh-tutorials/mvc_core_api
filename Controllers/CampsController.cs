@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyCodeCamp.Data;
+using MyCodeCamp.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,11 +30,16 @@ namespace CodeCamp.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        // MVC assumes any pass in parameter listed in the url are query string parameters
+        public IActionResult Get(int id, bool includeSpeakers = false)
         {
             try
             {
-                var camp = _repo.GetCamp(id);
+                Camp camp = null;
+
+                if (includeSpeakers) camp = _repo.GetCampWithSpeakers(id);
+                else camp = _repo.GetCamp(id);
+
                 if (camp == null) return NotFound($"Camp {id} not found.");
 
                 return Ok(camp);

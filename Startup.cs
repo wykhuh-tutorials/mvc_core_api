@@ -56,7 +56,15 @@ namespace CodeCamp
 
             services.AddApplicationInsightsTelemetry(_config);
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(opt =>
+                {
+                    // ReferenceLoopHandling deals with models that references other models. 
+                    // error - default; serializwer as much as possible for one  resource, then quit 
+                    // ignore - skip circular references for all resources
+                    // serialize - serialize circular loops
+                    opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
