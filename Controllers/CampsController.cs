@@ -66,24 +66,27 @@ namespace CodeCamp.Controllers
         [HttpPost("")]
         // use [FromBody] if incoming data is json
         // make request async using async Task<> ... await
-        public async Task<IActionResult> Post([FromBody]Camp model)
+        public async Task<IActionResult> Post([FromBody]CampModel model)
         {
             try
             {
                 _logger.LogInformation("Creating new camp.");
 
-                // save model to server;
-                // the return model will have server generated data such as id
-                _repo.Add(model);
+                // we are getting the model from request.body. need to convert model into entity.
+                var camp = _mapper.Map<Camp>(model);
+
+                // save camp entity to server;
+                // the returned entity will have server generated data such as id
+                _repo.Add(camp);
                 if (await _repo.SaveAllAsync())
                 {
                     // pass in id to Url.Link via anonymous object
-                    var newUri = Url.Link("CampGet", new { id = model.Id });
+                    var newUri = Url.Link("CampGet", new { moniker = camp.Moniker });
 
                     // use Created status for Post.
                     // Created needs new uri and record created.
-                    // model will contain server generated data.
-                    return Created(newUri, model);
+                    // use mapper to turn entity into a model that has server generated data
+                    return Created(newUri, _mapper.Map<CampModel>(camp));
                 }
                 else
                 {

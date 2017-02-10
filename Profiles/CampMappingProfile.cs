@@ -26,7 +26,26 @@ namespace CodeCamp.Profiles
                     opt => opt.ResolveUsing(camp => camp.EventDate.AddDays(camp.Length - 1)))
                  .ForMember(c => c.Url,
                     // instantiate CampUrlResolver using DI.
-                    opt => opt.ResolveUsing<CampUrlResolver>());
+                    opt => opt.ResolveUsing<CampUrlResolver>())
+                 // convert CampModel to Camp entity
+                 .ReverseMap()
+                 .ForMember(m => m.EventDate,
+                    opt => opt.MapFrom(model => model.StartDate))
+                 .ForMember(m => m.Length,
+                    opt => opt.ResolveUsing(model => (model.EndDate - model.StartDate).Days + 1))
+                 // convert flatten location to nested Location;
+                 .ForMember(m => m.Location,
+                        opt => opt.ResolveUsing(c => new Location()
+                        {
+                            Address1 = c.LocationAddress1,
+                            Address2 = c.LocationAddress2,
+                            Address3 = c.LocationAddress3,
+                            CityTown = c.LocationCityTown,
+                            StateProvince = c.LocationStateProvince,
+                            PostalCode = c.LocationPostalCode,
+                            Country = c.LocationCountry
+                        }));
+                
         }
     }
 }
