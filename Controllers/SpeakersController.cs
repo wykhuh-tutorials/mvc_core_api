@@ -72,5 +72,30 @@ namespace CodeCamp.Controllers
             }
             return BadRequest("create speaker error");
         }
+
+        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Put(string moniker, int id, [FromBody] SpeakerModel model)
+        {
+            try
+            {
+                var speaker = _repository.GetSpeaker(id);
+                if (speaker == null) return NotFound();
+                if (speaker.Camp.Moniker != moniker) return BadRequest("Speaker not in specified camp");
+
+                _mapper.Map(model, speaker);
+
+                if(await _repository.SaveAllAsync())
+                {
+                    return Ok(_mapper.Map<SpeakerModel>(speaker));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"update speaker exception: {ex}");
+            }
+            return BadRequest("update speaker error");
+
+        }
     }
 }
