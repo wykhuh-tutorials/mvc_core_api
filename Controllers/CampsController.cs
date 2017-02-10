@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
 using System;
@@ -13,12 +14,14 @@ namespace CodeCamp.Controllers
     public class CampsController : Controller
     {
         private ICampRepository _repo;
+        private ILogger _logger;
 
-        // constructor inject to access respository
-        public CampsController(ICampRepository repo)
+        // constructor inject to access dependencies
+        public CampsController(ICampRepository repo, ILogger<CampsController> logger)
         {
             // save copy of passed-in repo
             _repo = repo;
+            _logger = logger;
         }
         [HttpGet("")]
         // use IActionResult to return status code with the data 
@@ -58,6 +61,8 @@ namespace CodeCamp.Controllers
         {
             try
             {
+                _logger.LogInformation("Creating new camp.");
+
                 // save model to server;
                 // the return model will have server generated data such as id
                 _repo.Add(model);
@@ -71,9 +76,14 @@ namespace CodeCamp.Controllers
                     // model will contain server generated data.
                     return Created(newUri, model);
                 }
+                else
+                {
+                    _logger.LogWarning("Could not save camp.");
+                }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                _logger.LogError($"Save camp exception: {ex}");
             }
             return BadRequest();
         }
