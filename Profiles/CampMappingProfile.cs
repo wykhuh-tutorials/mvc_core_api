@@ -47,8 +47,11 @@ namespace CodeCamp.Profiles
                         }));
 
             CreateMap<Speaker, SpeakerModel>()
-                .ForMember(c => c.Url,
-                    opt => opt.ResolveUsing<SpeakerUrlResolver>())
+                .ForMember(c => c.Url, opt => opt.ResolveUsing<SpeakerUrlResolver>())
+                .ReverseMap();
+
+            CreateMap<Talk, TalkModel>()
+                .ForMember(c => c.Url, opt => opt.ResolveUsing<TalkUrlResolver>())
                 .ReverseMap();
         }
     }
