@@ -7,7 +7,8 @@ namespace CodeCamp.Models
 {
     public class CampModel
     {
-        public int Id { get; set; }
+        // use custom Url instead of Id
+        public string Url { get; set; }
         public string Moniker { get; set; }
         public string Name { get; set; }
         // the entity has EventDate; we want StartDate and EndDate for the model

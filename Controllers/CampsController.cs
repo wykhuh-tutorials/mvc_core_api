@@ -51,12 +51,15 @@ namespace CodeCamp.Controllers
 
                 if (camp == null) return NotFound($"Camp {id} not found.");
 
-                return Ok(_mapper.Map<CampModel>(camp));
+                // opt.Items passes a collection into the resolver.
+                // we are passing down UrlHelper to the resolver
+                return Ok(_mapper.Map<CampModel>(camp, opt => opt.Items["UrlHelper"] = this.Url));
             }
-            catch
+            catch(Exception ex)
             {
-                return BadRequest();
+                _logger.LogError($"get camp exception: {ex}");
             }
+            return BadRequest();
 
         }
 
