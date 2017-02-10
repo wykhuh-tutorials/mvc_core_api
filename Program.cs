@@ -12,13 +12,16 @@ namespace CodeCamp
     {
         public static void Main(string[] args)
         {
+            // create web host
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
+                // instantiate Startup class
                 .UseStartup<Startup>()
                 .Build();
-
+            
+            // start web host
             host.Run();
         }
     }
