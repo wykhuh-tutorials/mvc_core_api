@@ -18,21 +18,15 @@ namespace CodeCamp.Profiles
             CreateMap<Camp, CampModel>()
                 // first lamda: new field to add to model
                 // second lambda: how to calculate new field
-                .ForMember(c => c.StartDate, 
+                .ForMember(c => c.StartDate,
                     // MapFrom allows us to map from another entity field
                     opt => opt.MapFrom(camp => camp.EventDate))
                 .ForMember(c => c.EndDate,
                     // ResolveUsing allows us to calculate the model field
                     opt => opt.ResolveUsing(camp => camp.EventDate.AddDays(camp.Length - 1)))
-                .ForMember(c => c.Url,
-                    // source, destination, unused, resolution context
-                    opt => opt.ResolveUsing((camp, model, unused, ctx) =>
-                    {
-                        // we can get Items that we passed in from controller using ctx.Items.
-                        // we are casting UrlHelper to IUrlHelper type
-                        var url = (IUrlHelper)ctx.Items["UrlHelper"];
-                        return url.Link("CampGet", new { id = camp.Id });
-                    }));
+                 .ForMember(c => c.Url,
+                    // instantiate CampUrlResolver using DI.
+                    opt => opt.ResolveUsing<CampUrlResolver>());
         }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 
 namespace CodeCamp
 {
@@ -66,6 +67,9 @@ namespace CodeCamp
                     // serialize - serialize circular loops
                     opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
+
+            // add IHttpContextAccessor for CampUrlResolver.
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // add IMapper interface as injectable dependeny
             services.AddAutoMapper();

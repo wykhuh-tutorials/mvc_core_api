@@ -13,7 +13,7 @@ namespace CodeCamp.Controllers
 {
     // base route for all the actions in the controler
     [Route("api/[controller]")]
-    public class CampsController : Controller
+    public class CampsController : BaseController
     {
         private ICampRepository _repo;
         private ILogger _logger;
@@ -53,7 +53,7 @@ namespace CodeCamp.Controllers
 
                 // opt.Items passes a collection into the resolver.
                 // we are passing down UrlHelper to the resolver
-                return Ok(_mapper.Map<CampModel>(camp, opt => opt.Items["UrlHelper"] = this.Url));
+                return Ok(_mapper.Map<CampModel>(camp));
             }
             catch(Exception ex)
             {
