@@ -119,5 +119,30 @@ namespace CodeCamp.Controllers
             }
             return BadRequest();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var oldCamp = _repo.GetCamp(id);
+                if (oldCamp == null) return NotFound($"Could not find camp id {id}");
+
+                // pass in whole camp instead of just id so we can examine the camp before deleting
+                _repo.Delete(oldCamp);
+
+                if (await _repo.SaveAllAsync())
+                {
+                    return Ok();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"delete camp exception: {ex}");
+            }
+            return BadRequest();
+        }
+
     }
 }
