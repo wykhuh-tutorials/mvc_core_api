@@ -135,13 +135,13 @@ namespace CodeCamp.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{moniker}")]
+        public async Task<IActionResult> Delete(string moniker)
         {
             try
             {
-                var oldCamp = _repo.GetCamp(id);
-                if (oldCamp == null) return NotFound($"Could not find camp id {id}");
+                var oldCamp = _repo.GetCampByMoniker(moniker);
+                if (oldCamp == null) return NotFound($"Could not find camp moniker {moniker}");
 
                 // pass in whole camp instead of just id so we can examine the camp before deleting
                 _repo.Delete(oldCamp);
