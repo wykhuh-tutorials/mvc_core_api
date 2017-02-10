@@ -8,10 +8,13 @@ using MyCodeCamp.Data;
 using Microsoft.AspNetCore.Mvc;
 using CodeCamp.Models;
 using MyCodeCamp.Data.Entities;
+using CodeCamp.Filters;
 
 namespace CodeCamp.Controllers
 {
     [Route("api/camps/{moniker}/speakers")]
+    // calls custom filter that will check if model is valid before every action executes
+    [ValidateModel]
     public class SpeakersController : BaseController
     {
         private ICampRepository _repository;

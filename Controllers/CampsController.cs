@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CodeCamp.Filters;
 using CodeCamp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ namespace CodeCamp.Controllers
 {
     // base route for all the actions in the controler
     [Route("api/[controller]")]
+    [ValidateModel]
     public class CampsController : BaseController
     {
         private ICampRepository _repo;
@@ -70,9 +72,6 @@ namespace CodeCamp.Controllers
         {
             try
             {
-                // display errors if model is invalid
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-
                 _logger.LogInformation("Creating new camp.");
 
                 // we are getting the model from request.body. need to convert model into entity.
@@ -110,8 +109,6 @@ namespace CodeCamp.Controllers
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-
                 var oldCamp = _repo.GetCampByMoniker(moniker);
                 if (oldCamp == null) return NotFound($"Could not find camp moniker {moniker}");
 
