@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyCodeCamp.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,21 @@ namespace CodeCamp.Controllers
     [Route("api/[controller]")]
     public class CampsController : Controller
     {
+        private ICampRepository _repo;
+
+        // constructor inject to access respository
+        public CampsController(ICampRepository repo)
+        {
+            // save copy of passed-in repo
+            _repo = repo;
+        }
         [HttpGet("")]
         // use IActionResult to return status code with the data 
         public IActionResult Get()
         {
-            return Ok(new { Name = "Jane", Country = "England" });
+            var camps = _repo.GetAllCamps();
+
+            return Ok(camps);
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyCodeCamp.Data;
 
 namespace CodeCamp
 {
@@ -39,7 +40,14 @@ namespace CodeCamp
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            // Singleton: get service once for lifetime of application
             services.AddSingleton(_config);
+
+            // Scoped: get service once per request
+            // AddDbContext is from EF. Need to register the context with DI.
+            services.AddDbContext<CampContext>(ServiceLifetime.Scoped);
+            // pass in interface and concrete implementation
+            services.AddScoped<ICampRepository, CampRepository>();
 
             services.AddApplicationInsightsTelemetry(_config);
 
