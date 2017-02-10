@@ -29,7 +29,7 @@ namespace CodeCamp.Controllers
             return Ok(camps);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name ="CampGet")]
         // MVC assumes any pass in parameter listed in the url are query string parameters
         public IActionResult Get(int id, bool includeSpeakers = false)
         {
@@ -49,6 +49,33 @@ namespace CodeCamp.Controllers
                 return BadRequest();
             }
 
+        }
+
+        [HttpPost("")]
+        // use [FromBody] if incoming data is json
+        // make request async using async Task<> ... await
+        public async Task<IActionResult> Post([FromBody]Camp model)
+        {
+            try
+            {
+                // save model to server;
+                // the return model will have server generated data such as id
+                _repo.Add(model);
+                if (await _repo.SaveAllAsync())
+                {
+                    // pass in id to Url.Link via anonymous object
+                    var newUri = Url.Link("CampGet", new { id = model.Id });
+
+                    // use Created status for Post.
+                    // Created needs new uri and record created.
+                    // model will contain server generated data.
+                    return Created(newUri, model);
+                }
+            }
+            catch(Exception)
+            {
+            }
+            return BadRequest();
         }
     }
 }
