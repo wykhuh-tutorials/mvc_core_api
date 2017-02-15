@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace CodeCamp.Controllers
 {
@@ -21,6 +22,7 @@ namespace CodeCamp.Controllers
         private SignInManager<CampUser> _signInManager;
         private UserManager<CampUser> _userMgr;
         private IPasswordHasher<CampUser> _hasher;
+        private IConfigurationRoot _config;
 
         // allower developers to send us credentials, and we will set a cookie.
         // use cookie if only one browser-based web app uses the api.
@@ -28,13 +30,15 @@ namespace CodeCamp.Controllers
             SignInManager<CampUser> signInManager,
             ILogger<AuthController> logger,
             UserManager<CampUser> userMgr,
-            IPasswordHasher<CampUser> hasher)
+            IPasswordHasher<CampUser> hasher,
+            IConfigurationRoot config)
         {
             _context = context;
             _signInManager = signInManager;
             _logger = logger;
             _userMgr = userMgr;
             _hasher = hasher;
+            _config = config;
         }
 
         // use POST instead of GET because we don't want the crendentials to be sent in plain text query string
@@ -82,16 +86,18 @@ namespace CodeCamp.Controllers
                         };
 
                         // in real prod code, but config somewhere else
-                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ReallyInsecureSecret"));
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
                         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
                         // create token
+
                         var token = new JwtSecurityToken(
-                            issuer: "http://localhost",
-                            audience: "http://localhost",
+                            issuer: _config["Tokens:Issuer"],
+                            audience: _config["Tokens:Audience"],
                             claims: claims,
                             expires: DateTime.UtcNow.AddMinutes(15),
                             signingCredentials: creds
                           );
+
 
                         return Ok(new
                         {
