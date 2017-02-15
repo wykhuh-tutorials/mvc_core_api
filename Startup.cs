@@ -62,6 +62,7 @@ namespace CodeCamp
 
             //seed database
             services.AddTransient<CampDbInitializer>();
+            services.AddTransient<CampIdentityInitializer>();
 
             services.AddApplicationInsightsTelemetry(_config);
 
@@ -157,7 +158,8 @@ namespace CodeCamp
         public void Configure(IApplicationBuilder app,
             IHostingEnvironment env,
             ILoggerFactory loggerFactory,
-            CampDbInitializer seeder)
+            CampDbInitializer seeder,
+            CampIdentityInitializer IdentiySeeder)
         {
             // all middleware that must occur before mvc deals with a request must come before app.UseMvc();
             loggerFactory.AddConsole(_config.GetSection("Logging"));
@@ -173,6 +175,7 @@ namespace CodeCamp
  
             // Seed is async task. use Wait to make it synchronous.
             seeder.Seed().Wait();
+            IdentiySeeder.Seed().Wait();
         }
     }
 }
