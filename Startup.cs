@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Mvc;
 using MyCodeCamp.Data.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace CodeCamp
 {
@@ -170,6 +172,24 @@ namespace CodeCamp
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseIdentity();
+
+            app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            {
+                // if token is found, use it to authenticate
+                AutomaticAuthenticate = true,
+                // it token not found or token is invalid, respond as a challenge
+                AutomaticChallenge = true,
+                TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = _config["Tokens:Issuer"],
+                    ValidAudience = _config["Token:Audience"],
+                    // check is signing key is valid
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"])),
+                    // check if token is expired
+                    ValidateLifetime = true
+                }
+            });
 
             app.UseMvc();
  
