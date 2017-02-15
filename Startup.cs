@@ -87,6 +87,23 @@ namespace CodeCamp
 
             // add IMapper interface as injectable dependeny
             services.AddAutoMapper();
+
+            services.AddCors(cfg =>
+            {
+                cfg.AddPolicy("demo", bldr =>
+                {
+                    bldr.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:8000");
+                });
+
+                cfg.AddPolicy("anyGet", bldr =>
+                {
+                    bldr.AllowAnyHeader()
+                    .WithMethods("GET")
+                    .AllowAnyOrigin();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,7 +121,7 @@ namespace CodeCamp
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseMvc();
-
+ 
             // Seed is async task. use Wait to make it synchronous.
             seeder.Seed().Wait();
         }

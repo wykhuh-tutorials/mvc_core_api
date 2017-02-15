@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CodeCamp.Filters;
 using CodeCamp.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
@@ -14,6 +15,7 @@ namespace CodeCamp.Controllers
 {
     // base route for all the actions in the controler
     [Route("api/[controller]")]
+    [EnableCors("anyGet")]
     [ValidateModel]
     public class CampsController : BaseController
     {
@@ -66,6 +68,7 @@ namespace CodeCamp.Controllers
         }
 
         [HttpPost("")]
+        [EnableCors("demo")]
         // use [FromBody] if incoming data is json
         // make request async using async Task<> ... await
         public async Task<IActionResult> Post([FromBody]CampModel model)
