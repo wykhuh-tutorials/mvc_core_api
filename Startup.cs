@@ -11,6 +11,9 @@ using MyCodeCamp.Data;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyCodeCamp.Data.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace CodeCamp
 {
@@ -104,6 +107,49 @@ namespace CodeCamp
                     .AllowAnyOrigin();
                 });
             });
+
+            // pass in users and roles
+            services.AddIdentity<CampUser, IdentityRole>()
+                // context that contain identity information
+                .AddEntityFrameworkStores<CampContext>();
+
+            // set up how identity works
+            services.Configure<IdentityOptions>(config =>
+            {
+                // Events let you override methods form Identity
+                config.Cookies.ApplicationCookie.Events = new CookieAuthenticationEvents()
+                {
+                    // override certain functions.
+                    // identity default behavior is to redirect people to login page. 
+                    // we want to prevent redirect to login, and return 401.
+                    OnRedirectToLogin = (ctx) =>
+                    {
+                        // only do this override if we make request to "/api/..."
+                        if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == 200)
+                            ; {
+                            // return status code 401
+                            ctx.Response.StatusCode = 401;
+                        }
+
+                        // prevent redirect to login
+                        return Task.CompletedTask;
+                    },
+
+                    OnRedirectToAccessDenied = (ctx) =>
+                    {
+                        // only do this override if we make request to "/api/..."
+                        if (ctx.Request.Path.StartsWithSegments("/api") && ctx.Response.StatusCode == 200)
+                        {
+                            // return status code 403
+                            ctx.Response.StatusCode = 403;
+                        }
+
+                        // prevent redirect to login
+                        return Task.CompletedTask;
+                    }
+
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -113,12 +159,15 @@ namespace CodeCamp
             ILoggerFactory loggerFactory,
             CampDbInitializer seeder)
         {
+            // all middleware that must occur before mvc deals with a request must come before app.UseMvc();
             loggerFactory.AddConsole(_config.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
 
             app.UseApplicationInsightsExceptionTelemetry();
+
+            app.UseIdentity();
 
             app.UseMvc();
  

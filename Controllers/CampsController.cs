@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CodeCamp.Filters;
 using CodeCamp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,10 @@ namespace CodeCamp.Controllers
     // base route for all the actions in the controler
     [Route("api/[controller]")]
     [EnableCors("anyGet")]
+    // custom filter that validates the model for each controller
     [ValidateModel]
+    // make sure user is valid before doing action 
+    [Authorize]
     public class CampsController : BaseController
     {
         private ICampRepository _repo;
