@@ -68,6 +68,13 @@ namespace CodeCamp
 
             services.AddApplicationInsightsTelemetry(_config);
 
+            // determine which users authorized to do certain actions
+            services.AddAuthorization(cfg =>
+            {
+                // user must have a claim SuperUser that is set to true
+                cfg.AddPolicy("SuperUsers", p => p.RequireClaim("SuperUser", "True"));
+            });
+
             services.AddMvc( opt =>
             {
                 // thise filters are added MVC filters added to every controller.

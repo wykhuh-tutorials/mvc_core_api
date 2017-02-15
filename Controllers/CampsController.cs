@@ -71,8 +71,10 @@ namespace CodeCamp.Controllers
 
         }
 
-        [HttpPost("")]
         [EnableCors("demo")]
+        // only let SuperUser to create camps
+        [Authorize(Policy ="SuperUsers")]
+        [HttpPost("")]
         // use [FromBody] if incoming data is json
         // make request async using async Task<> ... await
         public async Task<IActionResult> Post([FromBody]CampModel model)

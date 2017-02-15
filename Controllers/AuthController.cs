@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace CodeCamp.Controllers
 {
@@ -79,11 +80,18 @@ namespace CodeCamp.Controllers
                     // check if POST password matches the stored PasswordHash
                     if (_hasher.VerifyHashedPassword(user, user.PasswordHash, model.Password)  == PasswordVerificationResult.Success)
                     {
+                        // claims from Identity
+                        var userClaims = await _userMgr.GetClaimsAsync(user);
+
+                        // custom claims
                         var claims = new[]
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                        };
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                            new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
+                            new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
+                            new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                        }.Union(userClaims);
 
                         // in real prod code, but config somewhere else
                         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
