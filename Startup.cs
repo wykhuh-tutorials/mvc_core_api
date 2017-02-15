@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CodeCamp
 {
@@ -33,9 +34,12 @@ namespace CodeCamp
             // read env vars
             builder.AddEnvironmentVariables();
             _config = builder.Build();
+
+            _env = env;
         }
 
         private IConfigurationRoot _config;
+        private IHostingEnvironment _env;
 
         // ConfigureServices and Configure are called once when server fires up.
 
@@ -58,7 +62,17 @@ namespace CodeCamp
 
             services.AddApplicationInsightsTelemetry(_config);
 
-            services.AddMvc()
+            services.AddMvc( opt =>
+            {
+                // thise filters are added MVC filters added to every controller.
+                // will redirect all http to https
+                if (!_env.IsProduction())
+                {
+                    // specify port so  port shows up  for redirects in  development 
+                    opt.SslPort = 44352;
+                }
+                opt.Filters.Add(new RequireHttpsAttribute());
+            })
                 .AddJsonOptions(opt =>
                 {
                     // ReferenceLoopHandling deals with models that references other models. 
